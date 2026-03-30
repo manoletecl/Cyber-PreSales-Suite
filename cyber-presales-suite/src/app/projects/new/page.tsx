@@ -46,7 +46,7 @@ export default function NewProjectPage() {
       };
 
       const id = await saveProject(project);
-      alert("Proyecto guardado ID: " + id);
+      window.location.href = "/dashboard";
  } catch (error: any) {
   console.error("Firebase save error:", error);
   alert(`Error al guardar proyecto: ${error?.message || error}`);

@@ -1,7 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getProjects } from "@/services/project-read";
-
 export default function DashboardPage() {
   const [projects, setProjects] = useState<any[]>([]);
 

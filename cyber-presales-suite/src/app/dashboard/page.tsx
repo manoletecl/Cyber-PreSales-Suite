@@ -1,6 +1,17 @@
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { getProjects } from "@/services/project-read";
 
 export default function DashboardPage() {
+  const [projects, setProjects] = useState<any[]>([]);
+
+  useEffect(() => {
+    async function load() {
+      const data = await getProjects();
+      setProjects(data);
+    }
+    load();
+  }, []);
   return (
     <main className="min-h-screen p-8">
       <div className="mx-auto max-w-6xl">

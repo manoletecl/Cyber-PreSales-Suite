@@ -2,7 +2,8 @@
 
 import { useMemo, useState } from "react";
 import { calculateProject } from "@/lib/calculations";
-import { defaultProjectInputs, ProjectInputs } from "@/types/project";
+import { defaultProjectInputs, ProjectInputs, Project } from "@/types/project";
+import { saveProject } from "@/services/project-service";
 
 const serviceOptions = [
   "SIEM",
@@ -25,6 +26,32 @@ export default function NewProjectPage() {
   const [inputs, setInputs] = useState<ProjectInputs>(defaultProjectInputs);
 
   const results = useMemo(() => calculateProject(inputs), [inputs]);
+
+  async function handleSaveProject() {
+    try {
+      const project: Project = {
+        id: "",
+        clientName,
+        projectName,
+        country,
+        industry,
+        opportunityType: "RFP",
+        owner: "Manuel",
+        description: "",
+        notes: "",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        inputs,
+        results,
+      };
+
+      const id = await saveProject(project);
+      alert("Proyecto guardado ID: " + id);
+    } catch (error) {
+      console.error(error);
+      alert("Error al guardar proyecto");
+    }
+  }
 
   function updateField<K extends keyof ProjectInputs>(field: K, value: ProjectInputs[K]) {
     setInputs((prev) => ({ ...prev, [field]: value }));
@@ -49,10 +76,30 @@ export default function NewProjectPage() {
           <section className="rounded-2xl border p-6">
             <h2 className="text-xl font-semibold">Datos generales</h2>
             <div className="mt-4 grid gap-4">
-              <input className="rounded-xl border p-3" placeholder="Cliente" value={clientName} onChange={(e) => setClientName(e.target.value)} />
-              <input className="rounded-xl border p-3" placeholder="Proyecto" value={projectName} onChange={(e) => setProjectName(e.target.value)} />
-              <input className="rounded-xl border p-3" placeholder="País" value={country} onChange={(e) => setCountry(e.target.value)} />
-              <input className="rounded-xl border p-3" placeholder="Industria" value={industry} onChange={(e) => setIndustry(e.target.value)} />
+              <input
+                className="rounded-xl border p-3"
+                placeholder="Cliente"
+                value={clientName}
+                onChange={(e) => setClientName(e.target.value)}
+              />
+              <input
+                className="rounded-xl border p-3"
+                placeholder="Proyecto"
+                value={projectName}
+                onChange={(e) => setProjectName(e.target.value)}
+              />
+              <input
+                className="rounded-xl border p-3"
+                placeholder="País"
+                value={country}
+                onChange={(e) => setCountry(e.target.value)}
+              />
+              <input
+                className="rounded-xl border p-3"
+                placeholder="Industria"
+                value={industry}
+                onChange={(e) => setIndustry(e.target.value)}
+              />
             </div>
 
             <h2 className="mt-8 text-xl font-semibold">Infraestructura</h2>
@@ -76,7 +123,11 @@ export default function NewProjectPage() {
               <NumberInput label="Cloud accounts" value={inputs.cloudAccounts} onChange={(v) => updateField("cloudAccounts", v)} />
               <div>
                 <label className="mb-2 block text-sm font-medium">Cobertura</label>
-                <select className="w-full rounded-xl border p-3" value={inputs.operationMode} onChange={(e) => updateField("operationMode", e.target.value as ProjectInputs["operationMode"])}>
+                <select
+                  className="w-full rounded-xl border p-3"
+                  value={inputs.operationMode}
+                  onChange={(e) => updateField("operationMode", e.target.value as ProjectInputs["operationMode"])}
+                >
                   <option value="8x5">8x5</option>
                   <option value="16x5">16x5</option>
                   <option value="24x7">24x7</option>
@@ -84,7 +135,11 @@ export default function NewProjectPage() {
               </div>
               <div>
                 <label className="mb-2 block text-sm font-medium">Criticidad</label>
-                <select className="w-full rounded-xl border p-3" value={inputs.criticality} onChange={(e) => updateField("criticality", e.target.value as ProjectInputs["criticality"])}>
+                <select
+                  className="w-full rounded-xl border p-3"
+                  value={inputs.criticality}
+                  onChange={(e) => updateField("criticality", e.target.value as ProjectInputs["criticality"])}
+                >
                   <option value="Baja">Baja</option>
                   <option value="Media">Media</option>
                   <option value="Alta">Alta</option>
@@ -102,7 +157,11 @@ export default function NewProjectPage() {
             <div className="mt-4 grid gap-2 sm:grid-cols-2">
               {serviceOptions.map((service) => (
                 <label key={service} className="flex items-center gap-2 rounded-xl border p-3">
-                  <input type="checkbox" checked={inputs.selectedServices.includes(service)} onChange={() => toggleService(service)} />
+                  <input
+                    type="checkbox"
+                    checked={inputs.selectedServices.includes(service)}
+                    onChange={() => toggleService(service)}
+                  />
                   <span>{service}</span>
                 </label>
               ))}
@@ -124,7 +183,9 @@ export default function NewProjectPage() {
                 {Object.entries(results.estimatedLicenses)
                   .filter(([, value]) => value)
                   .map(([key, value]) => (
-                    <li key={key}><strong>{key.toUpperCase()}:</strong> {value}</li>
+                    <li key={key}>
+                      <strong>{key.toUpperCase()}:</strong> {value}
+                    </li>
                   ))}
               </ul>
             </div>
@@ -146,6 +207,13 @@ export default function NewProjectPage() {
                 ))}
               </ul>
             </div>
+
+            <button
+              onClick={handleSaveProject}
+              className="mt-6 rounded-2xl bg-black px-5 py-3 text-white"
+            >
+              Guardar proyecto
+            </button>
           </section>
         </div>
       </div>
@@ -153,7 +221,15 @@ export default function NewProjectPage() {
   );
 }
 
-function NumberInput({ label, value, onChange }: { label: string; value: number; onChange: (value: number) => void }) {
+function NumberInput({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: number;
+  onChange: (value: number) => void;
+}) {
   return (
     <div>
       <label className="mb-2 block text-sm font-medium">{label}</label>
@@ -168,7 +244,15 @@ function NumberInput({ label, value, onChange }: { label: string; value: number;
   );
 }
 
-function Check({ label, checked, onChange }: { label: string; checked: boolean; onChange: (value: boolean) => void }) {
+function Check({
+  label,
+  checked,
+  onChange,
+}: {
+  label: string;
+  checked: boolean;
+  onChange: (value: boolean) => void;
+}) {
   return (
     <label className="flex items-center gap-2 rounded-xl border px-3 py-2">
       <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} />

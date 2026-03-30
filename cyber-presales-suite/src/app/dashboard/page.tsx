@@ -32,7 +32,17 @@ export default function DashboardPage() {
         </div>
 
         <div className="mt-8 rounded-2xl border p-5">
-          <p className="text-gray-600">Aún no hay proyectos guardados.</p>
+         {projects.length === 0 ? (
+  <p className="text-gray-600">Aún no hay proyectos guardados.</p>
+) : (
+  <ul className="space-y-3">
+    {projects.map((p) => (
+      <li key={p.id} className="rounded-xl border p-4">
+        <strong>{p.projectName || "Sin nombre"}</strong> - {p.clientName || "Sin cliente"}
+      </li>
+    ))}
+  </ul>
+)}
         </div>
       </div>
     </main>

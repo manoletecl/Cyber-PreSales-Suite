@@ -47,10 +47,10 @@ export default function NewProjectPage() {
 
       const id = await saveProject(project);
       alert("Proyecto guardado ID: " + id);
-    } catch (error) {
-      console.error(error);
-      alert("Error al guardar proyecto");
-    }
+ } catch (error: any) {
+  console.error("Firebase save error:", error);
+  alert(`Error al guardar proyecto: ${error?.message || error}`);
+}
   }
 
   function updateField<K extends keyof ProjectInputs>(field: K, value: ProjectInputs[K]) {
